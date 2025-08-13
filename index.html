@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 实时预览工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 h-screen overflow-hidden">
+    <div class="h-full flex flex-col">
+        <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+            <h1 class="text-lg font-semibold text-gray-800">HTML 实时预览工具</h1>
+            <button 
+                id="fullscreenBtn"
+                class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+                全屏预览
+            </button>
+        </div>
+        
+        <div class="flex-1 grid grid-cols-2 gap-0">
+            <!-- 左侧 HTML 输入区域 -->
+            <div class="bg-white border-r border-gray-200 flex flex-col">
+                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                    <h2 class="text-sm font-medium text-gray-700">HTML 代码</h2>
+                </div>
+                <textarea 
+                    id="htmlInput" 
+                    class="flex-1 w-full resize-none border-0 p-3 font-mono text-sm focus:outline-none"
+                    placeholder="在这里输入 HTML 代码..."
+                ><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>示例页面</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .highlight { background-color: #ffeb3b; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎使用 HTML 预览工具</h1>
+        <p>这是一个<span class="highlight">实时预览</span>的示例。</p>
+        <ul>
+            <li>修改左侧代码</li>
+            <li>右侧即时显示效果</li>
+            <li>支持完整的 HTML/CSS/JS</li>
+        </ul>
+    </div>
+</body>
+</html></textarea>
+            </div>
+            
+            <!-- 右侧预览区域 -->
+            <div class="bg-white flex flex-col">
+                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                    <h2 class="text-sm font-medium text-gray-700">预览效果</h2>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <iframe 
+                        id="preview" 
+                        class="w-full h-full border-0"
+                        sandbox="allow-scripts allow-same-origin"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全屏预览模态框 -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-white hidden z-50 opacity-0 transition-opacity duration-300">
+        <div class="h-full flex flex-col">
+            <div class="bg-gray-100 px-4 py-2 flex items-center justify-between border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800">全屏预览</h3>
+                <button 
+                    id="closeFullscreenBtn"
+                    class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                >
+                    退出全屏
+                </button>
+            </div>
+            <div class="flex-1 bg-white">
+                <iframe 
+                    id="fullscreenPreview" 
+                    class="w-full h-full border-0 bg-white"
+                    sandbox="allow-scripts allow-same-origin"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const htmlInput = document.getElementById('htmlInput');
+        const preview = document.getElementById('preview');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fullscreenModal = document.getElementById('fullscreenModal');
+        const fullscreenPreview = document.getElementById('fullscreenPreview');
+        const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+
+        function updatePreview() {
+            const htmlContent = htmlInput.value;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            preview.onload = () => URL.revokeObjectURL(url);
+            preview.src = url;
+            
+            if (!fullscreenModal.classList.contains('hidden')) {
+                const fullscreenBlob = new Blob([htmlContent], { type: 'text/html' });
+                const fullscreenUrl = URL.createObjectURL(fullscreenBlob);
+                fullscreenPreview.onload = () => URL.revokeObjectURL(fullscreenUrl);
+                fullscreenPreview.src = fullscreenUrl;
+            }
+        }
+
+        function openFullscreen() {
+            const htmlContent = htmlInput.value;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            fullscreenPreview.onload = () => {
+                URL.revokeObjectURL(url);
+                fullscreenModal.classList.remove('opacity-0');
+            };
+            fullscreenPreview.src = url;
+            
+            fullscreenModal.classList.remove('hidden');
+        }
+
+        function closeFullscreen() {
+            fullscreenModal.classList.add('opacity-0');
+            setTimeout(() => {
+                fullscreenModal.classList.add('hidden');
+            }, 300);
+        }
+
+        htmlInput.addEventListener('input', updatePreview);
+        fullscreenBtn.addEventListener('click', openFullscreen);
+        closeFullscreenBtn.addEventListener('click', closeFullscreen);
+        
+        fullscreenModal.addEventListener('click', (e) => {
+            if (e.target === fullscreenModal) {
+                closeFullscreen();
+            }
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !fullscreenModal.classList.contains('hidden')) {
+                closeFullscreen();
+            }
+        });
+        
+        updatePreview();
+    </script>
+</body>
+</html>
