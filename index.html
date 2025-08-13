@@ -3,26 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML 实时预览工具</title>
+    <title>HTML/Markdown 实时预览工具</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="bg-gray-50 h-screen overflow-hidden">
     <div class="h-full flex flex-col">
         <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-2 flex items-center justify-between">
-            <h1 class="text-lg font-semibold text-gray-800">HTML 实时预览工具</h1>
-            <button 
-                id="fullscreenBtn"
-                class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-                全屏预览
-            </button>
+            <h1 class="text-lg font-semibold text-gray-800">HTML/Markdown 实时预览工具</h1>
+            <div class="flex items-center space-x-2">
+                <div class="flex bg-gray-100 rounded-lg p-1">
+                    <button 
+                        id="htmlModeBtn"
+                        class="px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white"
+                    >
+                        HTML
+                    </button>
+                    <button 
+                        id="markdownModeBtn"
+                        class="px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200"
+                    >
+                        Markdown
+                    </button>
+                </div>
+                <button 
+                    id="fullscreenBtn"
+                    class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                    全屏预览
+                </button>
+            </div>
         </div>
         
         <div class="flex-1 grid grid-cols-2 gap-0">
             <!-- 左侧 HTML 输入区域 -->
             <div class="bg-white border-r border-gray-200 flex flex-col">
                 <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
-                    <h2 class="text-sm font-medium text-gray-700">HTML 代码</h2>
+                    <h2 id="inputTitle" class="text-sm font-medium text-gray-700">HTML 代码</h2>
                 </div>
                 <textarea 
                     id="htmlInput" 
@@ -57,7 +74,7 @@
             <!-- 右侧预览区域 -->
             <div class="bg-white flex flex-col">
                 <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
-                    <h2 class="text-sm font-medium text-gray-700">预览效果</h2>
+                    <h2 id="previewTitle" class="text-sm font-medium text-gray-700">预览效果</h2>
                 </div>
                 <div class="flex-1 overflow-hidden">
                     <iframe 
@@ -99,9 +116,172 @@
         const fullscreenModal = document.getElementById('fullscreenModal');
         const fullscreenPreview = document.getElementById('fullscreenPreview');
         const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+        const htmlModeBtn = document.getElementById('htmlModeBtn');
+        const markdownModeBtn = document.getElementById('markdownModeBtn');
+        const inputTitle = document.getElementById('inputTitle');
+        const previewTitle = document.getElementById('previewTitle');
+        
+        let currentMode = 'html';
+        
+        const markdownSample = `# 欢迎使用 Markdown 预览工具
+
+这是一个 **Markdown** 实时预览示例。
+
+## 功能特性
+
+- ✅ 实时渲染
+- ✨ 支持所有标准 Markdown 语法
+- 📱 全屏预览模式
+- 🎨 美观的样式
+
+## 代码示例
+
+\`\`\`javascript
+function hello() {
+    console.log('你好，Markdown!');
+}
+\`\`\`
+
+## 表格支持
+
+| 特性 | 支持 | 说明 |
+|------|------|------|
+| 标题 | ✓ | H1-H6 |
+| 列表 | ✓ | 有序/无序 |
+| 代码 | ✓ | 行内和代码块 |
+| 链接 | ✓ | [访问 GitHub](https://github.com) |
+
+> 这是一个引用文本示例。
+`;
+        
+        const htmlSample = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>示例页面</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .highlight { background-color: #ffeb3b; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎使用 HTML 预览工具</h1>
+        <p>这是一个<span class="highlight">实时预览</span>的示例。</p>
+        <ul>
+            <li>修改左侧代码</li>
+            <li>右侧即时显示效果</li>
+            <li>支持完整的 HTML/CSS/JS</li>
+        </ul>
+    </div>
+</body>
+</html>`;
 
         function updatePreview() {
-            const htmlContent = htmlInput.value;
+            const inputContent = htmlInput.value;
+            let htmlContent;
+            
+            if (currentMode === 'markdown') {
+                const markdownHtml = marked.parse(inputContent);
+                htmlContent = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 预览</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 10px; }
+        h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 8px; }
+        h3 { font-size: 1.25em; }
+        p { margin-bottom: 16px; }
+        ul, ol { padding-left: 30px; margin-bottom: 16px; }
+        li { margin-bottom: 4px; }
+        code {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-size: 85%;
+            margin: 0;
+            padding: 0.2em 0.4em;
+            font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            font-size: 85%;
+            line-height: 1.45;
+            overflow: auto;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        pre code {
+            background-color: transparent;
+            border: 0;
+            display: inline;
+            line-height: inherit;
+            margin: 0;
+            max-width: auto;
+            overflow: visible;
+            padding: 0;
+            word-wrap: normal;
+        }
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            color: #6a737d;
+            margin: 0 0 16px 0;
+            padding: 0 16px;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+        table th, table td {
+            border: 1px solid #dfe2e5;
+            padding: 6px 13px;
+        }
+        table th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    ${markdownHtml}
+</body>
+</html>`;
+            } else {
+                htmlContent = inputContent;
+            }
+            
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             
@@ -117,7 +297,16 @@
         }
 
         function openFullscreen() {
-            const htmlContent = htmlInput.value;
+            const inputContent = htmlInput.value;
+            let htmlContent;
+            
+            if (currentMode === 'markdown') {
+                const markdownHtml = marked.parse(inputContent);
+                htmlContent = getMarkdownHtmlTemplate(markdownHtml);
+            } else {
+                htmlContent = inputContent;
+            }
+            
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             
@@ -138,6 +327,130 @@
         }
 
         htmlInput.addEventListener('input', updatePreview);
+        function switchMode(mode) {
+            if (mode === currentMode) return;
+            
+            currentMode = mode;
+            
+            if (mode === 'html') {
+                htmlModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white';
+                markdownModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200';
+                inputTitle.textContent = 'HTML 代码';
+                htmlInput.placeholder = '在这里输入 HTML 代码...';
+                if (htmlInput.value === markdownSample || htmlInput.value === '') {
+                    htmlInput.value = htmlSample;
+                }
+            } else {
+                markdownModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white';
+                htmlModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200';
+                inputTitle.textContent = 'Markdown 代码';
+                htmlInput.placeholder = '在这里输入 Markdown 代码...';
+                if (htmlInput.value === htmlSample || htmlInput.value === '') {
+                    htmlInput.value = markdownSample;
+                }
+            }
+            
+            updatePreview();
+        }
+        
+        function getMarkdownHtmlTemplate(markdownHtml) {
+            return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 预览</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 10px; }
+        h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 8px; }
+        h3 { font-size: 1.25em; }
+        p { margin-bottom: 16px; }
+        ul, ol { padding-left: 30px; margin-bottom: 16px; }
+        li { margin-bottom: 4px; }
+        code {
+            background-color: #f6f8fa;
+            border-radius: 3px;
+            font-size: 85%;
+            margin: 0;
+            padding: 0.2em 0.4em;
+            font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            font-size: 85%;
+            line-height: 1.45;
+            overflow: auto;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        pre code {
+            background-color: transparent;
+            border: 0;
+            display: inline;
+            line-height: inherit;
+            margin: 0;
+            max-width: auto;
+            overflow: visible;
+            padding: 0;
+            word-wrap: normal;
+        }
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            color: #6a737d;
+            margin: 0 0 16px 0;
+            padding: 0 16px;
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+        table th, table td {
+            border: 1px solid #dfe2e5;
+            padding: 6px 13px;
+        }
+        table th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    ${markdownHtml}
+</body>
+</html>`;
+        }
+        
+        htmlModeBtn.addEventListener('click', () => switchMode('html'));
+        markdownModeBtn.addEventListener('click', () => switchMode('markdown'));
         fullscreenBtn.addEventListener('click', openFullscreen);
         closeFullscreenBtn.addEventListener('click', closeFullscreen);
         
