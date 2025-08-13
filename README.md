@@ -47,7 +47,7 @@
 git clone https://github.com/lhqs1314/html-and-markdown-preview.git
 
 # 进入项目目录
-cd html-preview
+cd html-and-markdown-preview
 
 # 使用任意 HTTP 服务器启动（可选）
 # 方法1：使用 Python
