@@ -44,7 +44,7 @@
 ### 本地部署
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/html-preview.git
+git clone https://github.com/lhqs1314/html-and-markdown-preview.git
 
 # 进入项目目录
 cd html-preview
@@ -88,13 +88,7 @@ npx serve .
 - **Markdown 解析**: Marked.js
 - **构建工具**: 无需构建，纯静态文件
 
-### 项目结构
-```
-html-preview/
-├── index.html          # 主页面文件
-├── README.md          # 项目说明文档
-└── assets/            # 静态资源（如有）
-```
+
 
 ### 核心特性实现
 - **实时预览**: 基于 `input` 事件监听和 `iframe` 动态更新
@@ -179,13 +173,13 @@ function getMarkdownHtmlTemplate(markdownHtml) {
 
 ## 📞 联系方式
 
-- 项目主页: [GitHub Repository](https://github.com/yourusername/html-preview)
-- 问题反馈: [GitHub Issues](https://github.com/yourusername/html-preview/issues)
-- 功能建议: [GitHub Discussions](https://github.com/yourusername/html-preview/discussions)
+- 项目主页: [GitHub Repository](https://github.com/lhqs1314/html-and-markdown-preview)
+- 问题反馈: [GitHub Issues](https://github.com/lhqs1314/html-and-markdown-preview/issues)
+- 功能建议: [GitHub Discussions](https://github.com/lhqs1314/html-and-markdown-preview/discussions)
 
 ---
 
 ⭐ 如果这个项目对你有帮助，请给它一个星标！
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/html-preview?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/html-preview?style=social)
+![GitHub stars](https://img.shields.io/github/stars/lhqs1314/html-and-markdown-preview?style=social)
+![GitHub forks](https://img.shields.io/github/forks/lhqs1314/html-and-markdown-preview?style=social)
