@@ -34,6 +34,38 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': {
+                            50: '#f0f9ff',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490'
+                        },
+                        'gray': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'SFMono-Regular', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -60,110 +92,202 @@
     }
     </script>
 </head>
-<body class="bg-gray-50 h-screen overflow-hidden">
+<body class="bg-gray-50 h-screen overflow-hidden font-sans antialiased">
     <div class="h-full flex flex-col">
-        <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-2 flex items-center justify-between">
-            <h1 class="text-lg font-semibold text-gray-800">HTML/Markdown 实时预览工具</h1>
-            <div class="flex items-center space-x-2">
-                <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button 
-                        id="htmlModeBtn"
-                        class="px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white"
-                    >
-                        HTML
-                    </button>
-                    <button 
-                        id="markdownModeBtn"
-                        class="px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200"
-                    >
-                        Markdown
-                    </button>
+        <!-- 现代化顶部导航栏 -->
+        <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold text-gray-900">Preview</h1>
+                        <p class="text-xs text-gray-500 -mt-1">HTML & Markdown</p>
+                    </div>
                 </div>
                 
-                <button 
-                    id="fullscreenBtn"
-                    class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                    全屏预览
-                </button>
-                <a 
-                    href="https://github.com/lhqs1314/html-and-markdown-preview"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="p-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    title="在GitHub上查看项目"
-                >
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
-        
-        <div class="flex-1 grid grid-cols-2 gap-0">
-            <!-- 左侧 HTML 输入区域 -->
-            <div class="bg-white border-r border-gray-200 flex flex-col">
-                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
-                    <h2 id="inputTitle" class="text-sm font-medium text-gray-700">HTML 代码</h2>
+                <div class="flex items-center space-x-3 flex-wrap gap-2">
+                    <!-- 模式切换器 -->
+                    <div class="flex bg-gray-100/80 rounded-xl p-0.5 backdrop-blur-sm">
+                        <button 
+                            id="htmlModeBtn"
+                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 bg-white text-primary-600 shadow-sm"
+                        >
+                            HTML
+                        </button>
+                        <button 
+                            id="markdownModeBtn"
+                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 text-gray-600 hover:text-gray-900"
+                        >
+                            Markdown
+                        </button>
+                    </div>
+                    
+                    <!-- 全屏预览按钮 -->
+                    <button 
+                        id="fullscreenBtn"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
+                    >
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        </svg>
+                        预览
+                    </button>
+                    
+                    <!-- GitHub链接 -->
+                    <a 
+                        href="https://github.com/lhqs1314/html-and-markdown-preview"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100/80"
+                        title="在GitHub上查看项目"
+                    >
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
                 </div>
-                <textarea 
-                    id="htmlInput" 
-                    class="flex-1 w-full resize-none border-0 p-3 font-mono text-sm focus:outline-none"
-                    placeholder="在这里输入 HTML 代码..."
-                ><!DOCTYPE html>
+            </div>
+        </header>
+        
+        <!-- 主要内容区域 -->
+        <main class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-1 p-1 bg-gray-100/50">
+            <!-- 编辑器面板 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 flex flex-col overflow-hidden">
+                <!-- 编辑器头部 -->
+                <div class="bg-gray-50/80 px-4 py-3 border-b border-gray-200/50 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                        <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span id="inputTitle" class="ml-3 text-sm font-medium text-gray-700">HTML 代码</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        实时编辑
+                    </div>
+                </div>
+                
+                <!-- 代码编辑区 -->
+                <div class="flex-1 relative">
+                    <textarea 
+                        id="htmlInput" 
+                        class="flex-1 w-full h-full resize-none border-0 p-4 font-mono text-sm leading-relaxed focus:outline-none bg-white/50 backdrop-blur-sm"
+                        placeholder="在这里输入 HTML 代码..."
+                        spellcheck="false"
+                    ><!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <title>示例页面</title>
+    <title>现代化示例</title>
     <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #333; }
-        .highlight { background-color: #ffeb3b; padding: 5px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            line-height: 1.6; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card { 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px); 
+            border-radius: 12px; 
+            padding: 30px; 
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .highlight { 
+            background: rgba(255,255,255,0.2); 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>欢迎使用 HTML 预览工具</h1>
-        <p>这是一个<span class="highlight">实时预览</span>的示例。</p>
+    <div class="card">
+        <h1>🚀 现代化预览工具</h1>
+        <p>这是一个<span class="highlight">现代化设计</span>的示例页面。</p>
         <ul>
-            <li>修改左侧代码</li>
-            <li>右侧即时显示效果</li>
-            <li>支持完整的 HTML/CSS/JS</li>
+            <li>✨ 美观的视觉效果</li>
+            <li>🎯 实时预览</li>
+            <li>⚡ 流畅的动画</li>
         </ul>
     </div>
 </body>
 </html></textarea>
+                    <!-- 行号指示器 -->
+                    <div class="absolute top-4 right-4 text-xs text-gray-400 bg-gray-100/80 px-2 py-1 rounded">
+                        <span id="lineCount">1</span> 行
+                    </div>
+                </div>
             </div>
             
-            <!-- 右侧预览区域 -->
-            <div class="bg-white flex flex-col">
-                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
-                    <h2 id="previewTitle" class="text-sm font-medium text-gray-700">预览效果</h2>
+            <!-- 预览面板 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200/50 flex flex-col overflow-hidden">
+                <!-- 预览头部 -->
+                <div class="bg-gray-50/80 px-4 py-3 border-b border-gray-200/50 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                        <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span id="previewTitle" class="ml-3 text-sm font-medium text-gray-700">实时预览</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs text-gray-500">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        实时更新
+                    </div>
                 </div>
-                <div class="flex-1 overflow-hidden">
+                
+                <!-- 预览内容 -->
+                <div class="flex-1 overflow-hidden relative">
                     <iframe 
                         id="preview" 
-                        class="w-full h-full border-0"
+                        class="w-full h-full border-0 bg-white"
                         sandbox="allow-scripts allow-same-origin"
                     ></iframe>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- 全屏预览模态框 -->
-    <div id="fullscreenModal" class="fixed inset-0 bg-white hidden z-50 opacity-0 transition-opacity duration-300">
-        <div class="h-full flex flex-col">
-            <div class="bg-gray-100 px-4 py-2 flex items-center justify-between border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-800">全屏预览</h3>
-                <button 
-                    id="closeFullscreenBtn"
-                    class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                >
-                    退出全屏
-                </button>
-            </div>
+    <!-- 现代化全屏预览模态框 -->
+    <div id="fullscreenModal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm hidden z-50 opacity-0 transition-all duration-300">
+        <div class="h-full flex flex-col animate-scale-up">
+            <!-- 全屏预览头部 -->
+            <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/50 px-6 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">全屏预览</h3>
+                            <p class="text-xs text-gray-500 -mt-1">Fullscreen Preview</p>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        id="closeFullscreenBtn"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all duration-200"
+                    >
+                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        退出
+                    </button>
+                </div>
+            </header>
+            
+            <!-- 全屏预览内容 -->
             <div class="flex-1 bg-white">
                 <iframe 
                     id="fullscreenPreview" 
@@ -173,6 +297,50 @@
             </div>
         </div>
     </div>
+
+    <style>
+        /* 自定义动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .animate-scale-up {
+            animation: scaleUp 0.2s ease-out;
+        }
+        
+        /* 代码编辑器样式增强 */
+        #htmlInput:focus {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.8);
+        }
+    </style>
 
     <script>
         const htmlInput = document.getElementById('htmlInput');
@@ -185,60 +353,95 @@
         const markdownModeBtn = document.getElementById('markdownModeBtn');
         const inputTitle = document.getElementById('inputTitle');
         const previewTitle = document.getElementById('previewTitle');
+        const lineCount = document.getElementById('lineCount');
         
         let currentMode = 'html';
         
-        const markdownSample = `# 欢迎使用 Markdown 预览工具
+        // 行数计算函数
+        function updateLineCount() {
+            const lines = htmlInput.value.split('\n').length;
+            lineCount.textContent = lines;
+        }
+        
+        const markdownSample = `# 🌟 现代化 Markdown 预览
 
-这是一个 **Markdown** 实时预览示例。
+这是一个**现代化设计**的 Markdown 实时预览示例。
 
-## 功能特性
+## ✨ 功能特性
 
-- ✅ 实时渲染
-- ✨ 支持所有标准 Markdown 语法
-- 📱 全屏预览模式
-- 🎨 美观的样式
+- 🚀 **实时渲染** - 即时预览效果
+- 🎨 **现代设计** - 美观的视觉效果  
+- 📱 **响应式** - 完美适配各种设备
+- ⚡ **流畅动画** - 丝滑的用户体验
 
-## 代码示例
+## 💻 代码示例
 
 \`\`\`javascript
-function hello() {
-    console.log('你好，Markdown!');
-}
+// 现代化的 JavaScript 示例
+const createPreview = async () => {
+    const content = await processMarkdown();
+    return {
+        html: content,
+        style: 'modern',
+        animation: true
+    };
+};
 \`\`\`
 
-## 表格支持
+## 📊 特性对比
 
-| 特性 | 支持 | 说明 |
-|------|------|------|
-| 标题 | ✓ | H1-H6 |
-| 列表 | ✓ | 有序/无序 |
-| 代码 | ✓ | 行内和代码块 |
-| 链接 | ✓ | [访问 GitHub](https://github.com) |
+| 功能 | 支持程度 | 体验评分 |
+|------|----------|----------|
+| 实时预览 | ✅ 完全支持 | ⭐⭐⭐⭐⭐ |
+| 语法高亮 | ✅ 完全支持 | ⭐⭐⭐⭐⭐ |
+| 全屏模式 | ✅ 完全支持 | ⭐⭐⭐⭐⭐ |
+| 响应式设计 | ✅ 完全支持 | ⭐⭐⭐⭐⭐ |
 
-> 这是一个引用文本示例。
+> 💡 **提示**: 这个工具采用了现代化的设计理念，提供更好的用户体验。
+
+---
+
+*感谢使用我们的预览工具！* 🎉
 `;
         
         const htmlSample = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <title>示例页面</title>
+    <title>现代化示例</title>
     <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #333; }
-        .highlight { background-color: #ffeb3b; padding: 5px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            line-height: 1.6; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card { 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px); 
+            border-radius: 12px; 
+            padding: 30px; 
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .highlight { 
+            background: rgba(255,255,255,0.2); 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>欢迎使用 HTML 预览工具</h1>
-        <p>这是一个<span class="highlight">实时预览</span>的示例。</p>
+    <div class="card">
+        <h1>🚀 现代化预览工具</h1>
+        <p>这是一个<span class="highlight">现代化设计</span>的示例页面。</p>
         <ul>
-            <li>修改左侧代码</li>
-            <li>右侧即时显示效果</li>
-            <li>支持完整的 HTML/CSS/JS</li>
+            <li>✨ 美观的视觉效果</li>
+            <li>🎯 实时预览</li>
+            <li>⚡ 流畅的动画</li>
         </ul>
     </div>
 </body>
@@ -391,23 +594,27 @@ function hello() {
             }, 300);
         }
 
-        htmlInput.addEventListener('input', updatePreview);
+        htmlInput.addEventListener('input', () => {
+            updatePreview();
+            updateLineCount();
+        });
+        
         function switchMode(mode) {
             if (mode === currentMode) return;
             
             currentMode = mode;
             
             if (mode === 'html') {
-                htmlModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white';
-                markdownModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200';
+                htmlModeBtn.className = 'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 bg-white text-primary-600 shadow-sm';
+                markdownModeBtn.className = 'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 text-gray-600 hover:text-gray-900';
                 inputTitle.textContent = 'HTML 代码';
                 htmlInput.placeholder = '在这里输入 HTML 代码...';
                 if (htmlInput.value === markdownSample || htmlInput.value === '') {
                     htmlInput.value = htmlSample;
                 }
             } else {
-                markdownModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors bg-blue-500 text-white';
-                htmlModeBtn.className = 'px-3 py-1 text-sm rounded transition-colors text-gray-600 hover:bg-gray-200';
+                markdownModeBtn.className = 'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 bg-white text-primary-600 shadow-sm';
+                htmlModeBtn.className = 'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 text-gray-600 hover:text-gray-900';
                 inputTitle.textContent = 'Markdown 代码';
                 htmlInput.placeholder = '在这里输入 Markdown 代码...';
                 if (htmlInput.value === htmlSample || htmlInput.value === '') {
@@ -416,6 +623,7 @@ function hello() {
             }
             
             updatePreview();
+            updateLineCount();
         }
         
         function getMarkdownHtmlTemplate(markdownHtml) {
@@ -531,7 +739,25 @@ function hello() {
             }
         });
         
-        updatePreview();
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePreview();
+            updateLineCount();
+            
+            // 添加加载动画
+            document.body.classList.add('animate-fade-in');
+        });
+        
+        // 如果DOM已经加载完成，直接执行初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                updatePreview();
+                updateLineCount();
+            });
+        } else {
+            updatePreview();
+            updateLineCount();
+        }
     </script>
 </body>
 </html>
